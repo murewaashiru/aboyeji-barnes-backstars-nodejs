@@ -46,14 +46,14 @@ passport.use(
   )
 );
 
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       name: 'google',
-//       clientID: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//       callbackURL: '/api/v1/auth/google/redirect'
-//     },
-//     getProfile
-//   )
-// );
+passport.use(
+  new GoogleStrategy(
+    {
+      name: 'google',
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: '/api/v1/auth/google/redirect'
+    },
+    getProfile
+  )
+);
