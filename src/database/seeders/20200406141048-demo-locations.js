@@ -1,21 +1,11 @@
+/* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable no-unused-vars */
-/* eslint-disable arrow-body-style */
 const createdAt = new Date();
 const updatedAt = new Date();
 
 export default {
-  up: (queryInterface, Sequelize) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkInsert('People', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
-    return queryInterface.bulkInsert(
+  up: (queryInterface, Sequelize) =>
+    queryInterface.bulkInsert(
       'Locations',
       [
         {
@@ -44,16 +34,8 @@ export default {
         }
       ],
       {}
-    );
-  },
+    ),
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('People', null, {});
-    */
-  }
+  down: (queryInterface, Sequelize) =>
+    queryInterface.bulkDelete('Locations', null, {})
 };

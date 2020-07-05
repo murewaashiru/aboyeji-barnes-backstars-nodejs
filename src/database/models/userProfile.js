@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export default (sequelize, DataTypes) => {
   const UserProfile = sequelize.define(
     'UserProfile',
@@ -17,7 +16,10 @@ export default (sequelize, DataTypes) => {
     {}
   );
   UserProfile.associate = (models) => {
-    // associations can be defined here
+    UserProfile.belongsTo(models.Users, {
+      foreignKey: 'userId',
+      onDelete: 'CASCADE'
+    });
   };
   return UserProfile;
 };

@@ -1,12 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable arrow-parens */
-/* eslint-disable no-undef */
-
 export default (sequelize, DataTypes) => {
   const Accommodations = sequelize.define(
     'Accommodations',
     {
-      name: DataTypes.STRING,
+      name: {
+        allowNull: false,
+        type: DataTypes.STRING
+      },
       status: {
         type: DataTypes.STRING,
         defaultValue: 'Available',
@@ -17,23 +16,46 @@ export default (sequelize, DataTypes) => {
           }
         }
       },
-      imageUrl: DataTypes.ARRAY(DataTypes.STRING),
+      imageUrl: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
       amenities: DataTypes.ARRAY(DataTypes.STRING),
-      locationId: DataTypes.INTEGER,
+      locationId: { type: DataTypes.INTEGER, allowNull: false },
       description: DataTypes.TEXT,
       services: DataTypes.ARRAY(DataTypes.STRING),
       owner: DataTypes.INTEGER,
-      mapLocations: DataTypes.JSON
+      mapLocations: DataTypes.JSONB
     },
     {}
   );
   Accommodations.associate = (models) => {
-    // associations can be defined here
-    // Accommodations.hasMany(models.Rooms, {
-    //   foreignKey: 'accomodationId',
-    //   as: 'rooms',
-    //   onDelete: 'CASCADE',
-    // });
+    Accommodations.belongsToMany(models.Requests, {
+      through: 'AccommodationRequests',
+      as: 'requests',
+      foreignKey: 'accommodationId'
+    });
+    Accommodations.hasMany(models.Rooms, {
+      foreignKey: 'accommodationId',
+      as: 'rooms',
+      onDelete: 'CASCADE'
+    });
+    Accommodations.hasMany(models.Ratings, {
+      foreignKey: 'accommodationId',
+      as: 'rating',
+      onDelete: 'CASCADE'
+    });
+    Accommodations.hasMany(models.Likes, {
+      foreignKey: 'accommodationId',
+      as: 'likes',
+      onDelete: 'CASCADE'
+    });
+    Accommodations.belongsTo(models.Location, {
+      foreignKey: 'locationId',
+      onDelete: 'CASCADE'
+    });
+    Accommodations.hasMany(models.Feedbacks, {
+      foreignKey: 'accommodationId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
   };
   return Accommodations;
 };

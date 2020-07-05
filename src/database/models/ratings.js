@@ -1,6 +1,4 @@
-/* eslint-disable func-names */
-/* eslint-disable no-unused-vars */
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   const Ratings = sequelize.define(
     'Ratings',
     {
@@ -10,8 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     {}
   );
-  Ratings.associate = function (models) {
-    // associations can be defined here
+  Ratings.associate = (models) => {
+    Ratings.belongsTo(models.Users, {
+      foreignKey: 'userId'
+    });
+    Ratings.belongsTo(models.Accommodations, {
+      foreignKey: 'accommodationId'
+    });
   };
   return Ratings;
 };

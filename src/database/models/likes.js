@@ -1,17 +1,34 @@
-/* eslint-disable func-names */
-/* eslint-disable no-undef */
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   const Likes = sequelize.define(
     'Likes',
     {
-      userId: DataTypes.INTEGER,
-      accommodationId: DataTypes.INTEGER,
-      status: DataTypes.BOOLEAN
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
+      },
+      accommodationId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
+      }
     },
     {}
   );
-  Likes.associate = function (models) {
-    // associations can be defined here
+  Likes.associate = (models) => {
+    Likes.belongsTo(models.Accommodations, {
+      foreignKey: 'accommodationId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Likes.belongsTo(models.Users, {
+      foreignKey: 'userId',
+      onDelete: 'CASCADE'
+    });
   };
   return Likes;
 };

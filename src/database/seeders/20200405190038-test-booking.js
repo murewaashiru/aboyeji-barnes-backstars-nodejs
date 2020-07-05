@@ -1,18 +1,8 @@
-'use strict';
-
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkInsert('People', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
-    return queryInterface.bulkInsert(
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable no-unused-vars */
+export default {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.bulkInsert(
       'Bookings',
       [
         {
@@ -41,7 +31,7 @@ module.exports = {
         },
         {
           requestId: 4,
-          roomId: 200,
+          roomId: 4,
           checkIn: new Date(),
           checkOut: new Date(),
           createdAt: new Date(),
@@ -49,17 +39,8 @@ module.exports = {
         }
       ],
       {}
-    );
-  },
+    ),
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('People', null, {});
-    */
-    return queryInterface.bulkDelete('Bookings', null, {});
-  }
+  down: (queryInterface, Sequelize) =>
+    queryInterface.bulkDelete('Bookings', null, {})
 };

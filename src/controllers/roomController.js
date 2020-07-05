@@ -1,32 +1,19 @@
-/* eslint-disable*/
 import Response from '../utils/response';
 import accommodationService from '../services/accommodationService';
 
 /** Class that handles rooms */
 class Rooms {
-  //Get all rooms for an accommodation
-  static async getRooms(req, res, next) {
-    const accommodationId = req.query.accommodationid;
-    try {
-      // get accommodation rooms from database
-      const data = await accommodationService.getRooms(accommodationId);
-
-      const message = `Rooms for accommodation with the id ${accommodationId}`;
-
-      return Response.customResponse(res, 200, message, data);
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-  //Get all rooms for all accommodations
+  /**
+   *  Gets all rooms
+   * @param {object} req - request object
+   * @param {object} res - response object
+   * @param {object} next - next middleware
+   * @returns {object} custom response
+   */
   static async getAllRooms(req, res, next) {
     try {
-      // get accommodation rooms from database
       const data = await accommodationService.getAllRooms();
-
-      const message = `Rooms for all accommodations`;
-
+      const message = 'Rooms for all accommodations';
       return Response.customResponse(res, 200, message, data);
     } catch (error) {
       return next(error);

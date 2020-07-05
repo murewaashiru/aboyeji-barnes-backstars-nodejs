@@ -1,15 +1,22 @@
-'use strict';
-module.exports = (sequelize, DataTypes, Op) => {
+export default (sequelize, DataTypes) => {
   const Bookings = sequelize.define(
     'Bookings',
     {
       requestId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'Requests',
+          key: 'id'
+        }
       },
       roomId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'Rooms',
+          key: 'id'
+        }
       },
 
       checkIn: {
@@ -24,8 +31,15 @@ module.exports = (sequelize, DataTypes, Op) => {
     },
     {}
   );
-  Bookings.associate = function (models) {
-    // associations can be defined here
+  Bookings.associate = (models) => {
+    Bookings.belongsTo(models.Rooms, {
+      onDelete: 'CASCADE',
+      foreignKey: 'roomId'
+    });
+    Bookings.belongsTo(models.Requests, {
+      onDelete: 'CASCADE',
+      foreignKey: 'requestId'
+    });
   };
   return Bookings;
 };

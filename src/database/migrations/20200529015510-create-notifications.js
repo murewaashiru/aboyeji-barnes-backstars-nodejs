@@ -1,27 +1,28 @@
-/* eslint-disable */
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Rooms', {
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable no-unused-vars */
+export default {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.createTable('Notifications', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      notification: {
         type: Sequelize.STRING
+      },
+      userId: {
+        type: Sequelize.INTEGER
       },
       type: {
         type: Sequelize.STRING
       },
-      accommodationId: {
+      requestId: {
         type: Sequelize.INTEGER
       },
-      status: {
+      read: {
         type: Sequelize.BOOLEAN
-      },
-      price: {
-        type: Sequelize.FLOAT
       },
       createdAt: {
         allowNull: false,
@@ -31,9 +32,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Rooms');
-  }
+    }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('Notifications')
 };

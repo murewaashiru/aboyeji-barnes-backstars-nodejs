@@ -1,7 +1,8 @@
-/* eslint-disable */
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Likes', {
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable no-unused-vars */
+export default {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.createTable('Likes', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -14,9 +15,6 @@ module.exports = {
       accommodationId: {
         type: Sequelize.INTEGER
       },
-      status: {
-        type: Sequelize.BOOLEAN
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -25,9 +23,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Likes');
-  }
+    }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('Likes')
 };

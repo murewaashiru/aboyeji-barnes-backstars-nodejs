@@ -3,11 +3,13 @@ import Response from '../utils/response';
 import Password from '../utils/generatePassword';
 import SessionManager from '../utils/sessionManager';
 import UserService from '../services/userService';
+import UserProfileService from '../services/userProfileService';
 import Email from '../utils/mails/email';
 import VerifyEmail from '../utils/mails/verify.email';
 import ResetPasswordEmail from '../utils/mails/resetPassword.email';
 import SupplierEmail from '../utils/mails/supplier.email';
 import { FRONTEND_URL } from '../config';
+import Emitter from '../utils/eventEmitter';
 
 /** Class that handles user */
 class Users {
@@ -16,7 +18,7 @@ class Users {
    * @param {object} req -request object
    * @param {object} res - response object
    * @param {object} next - next middleware
-   * @returns {object} response
+   * @returns {object} custom response
    */
   async createUser(req, res, next) {
     const rawData = req.body;
@@ -71,7 +73,7 @@ class Users {
    * @param {object} req - request object
    * @param {object} res -response object
    * @param {object} next - next middleware
-   * @return {object} response
+   * @returns {object} custom response
    */
   async login(req, res, next) {
     try {
@@ -102,6 +104,15 @@ class Users {
       delete user.accountVerified;
       delete user.createdAt;
       delete user.updatedAt;
+
+      const profile = await UserProfileService.getProfile(user.id);
+      if (profile.dataValues.userProfile) {
+        const profileData = profile.dataValues.userProfile.dataValues;
+        res.cookie('passportNumber', profileData.passportNumber);
+        res.cookie('passportName', profileData.passportName);
+        res.cookie('gender', profileData.gender);
+      }
+      await Emitter.emit('new-user', user);
       return Response.customResponse(
         res,
         200,
@@ -155,6 +166,7 @@ class Users {
       message: 'Successfully logged in',
       data: token
     };
+    await Emitter.emit('new-user', data);
     const responseBuffer = Buffer.from(JSON.stringify(apiResponse));
     return res.redirect(
       `${FRONTEND_URL}/login?code=${responseBuffer.toString('base64')}`
@@ -282,7 +294,7 @@ class Users {
         url
       );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -463,7 +475,32 @@ class Users {
         { emailAllowed: data[1][0].emailAllowed }
       );
     } catch (error) {
-      next(error);
+      return next(error);
+    }
+  }
+
+  /**
+   * switchAutofill option
+   * @param {object} req request object
+   * @param {object} res response object
+   * @param {object} next next middleware
+   * @returns {object} custom response
+   */
+  async switchAutofill(req, res, next) {
+    try {
+      const { id, requestAutofill } = req.user;
+      const data = await UserService.updateUser(
+        { id },
+        { requestAutofill: !requestAutofill }
+      );
+      return Response.customResponse(
+        res,
+        200,
+        'Your request autofill preference has been successfully updated',
+        { requestAutofill: data[1][0].requestAutofill }
+      );
+    } catch (error) {
+      return next(error);
     }
   }
 
@@ -496,7 +533,7 @@ class Users {
         { emailAllowed: data[1][0].emailAllowed }
       );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 }

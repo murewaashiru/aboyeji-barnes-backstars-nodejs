@@ -1,12 +1,24 @@
-/* eslint-disable*/
+import sequelize from 'sequelize';
 import database from '../database/models';
 
-const { Rooms, Accommodations } = database;
+const {
+  Rooms,
+  Accommodations,
+  Location,
+  Likes,
+  Feedbacks,
+  Users,
+  ProfilePictures,
+  Ratings,
+  Requests
+} = database;
 
+/** Class that handles accommodation service */
 class accommodationService {
   /**
-   * @param {object} accommmodation - accommmodation object.
-   * @returns {object} - created accommmodation object
+   * creates a new accommodation
+   * @param {object} accommodation - accommodation object.
+   * @returns {object} - created accommodation object
    */
   static async createAccommodation(accommodation) {
     try {
@@ -17,12 +29,71 @@ class accommodationService {
       throw error;
     }
   }
+
   /**
-   * @returns {object} - existing accommmodation object
+   * @returns {object} - existing accommodation object
    */
   static async getAllAccommodations() {
     try {
-      const data = await Accommodations.findAll();
+      const data = await Accommodations.findAll({
+        subQuery: false,
+        group: [
+          'Accommodations.id',
+          'Location.id',
+          'likes.id',
+          'rating.id',
+          'rooms.id'
+        ],
+        attributes: [
+          'id',
+          'name',
+          'status',
+          'imageUrl',
+          'owner',
+          'locationId',
+          'description',
+          'mapLocations',
+          [
+            sequelize.fn('AVG', sequelize.col('rating.rating')),
+            'averageRating'
+          ],
+          [
+            sequelize.fn(
+              'CONCAT',
+              sequelize.col('Location.city'),
+              ', ',
+              sequelize.col('Location.country')
+            ),
+            'location'
+          ]
+        ],
+        include: [
+          {
+            model: Rooms,
+            as: 'rooms',
+            attributes: ['accommodationId']
+          },
+          {
+            model: Ratings,
+            as: 'rating',
+            attributes: [],
+            duplicating: false
+          },
+          {
+            model: Location,
+            as: 'Location',
+            attributes: [],
+            duplicating: false
+          },
+
+          {
+            model: Likes,
+            as: 'likes',
+            attributes: ['id']
+          }
+        ],
+        raw: false
+      });
       return data;
     } catch (error) {
       throw error;
@@ -30,13 +101,65 @@ class accommodationService {
   }
 
   /**
-   * @param {id} params - accommmodation integer.
-   * @returns {object} -  accommmodation object
+   * get an accommodation by a parameter
+   * @param {id} params to check by
+   * @returns {object} accommodation object
    */
   static async getAccommodation(params) {
     try {
       const singleAccommodation = await Accommodations.findOne({
-        where: { id: params }
+        where: [params],
+        include: [
+          {
+            model: Rooms,
+            as: 'rooms',
+            attributes: [
+              'id',
+              'name',
+              'type',
+              'accommodationId',
+              'status',
+              'price'
+            ]
+          },
+          {
+            model: Location,
+            attributes: ['id', 'city', 'country']
+          },
+          {
+            model: Likes,
+            as: 'likes',
+            attributes: ['accommodationId']
+          },
+          {
+            model: Feedbacks,
+            include: [
+              {
+                model: Users,
+                attributes: [
+                  'id',
+                  'firstName',
+                  'lastName',
+                  'userEmail',
+                  'userRoles'
+                ],
+                include: [
+                  {
+                    model: ProfilePictures
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            model: Requests,
+            as: 'requests'
+          },
+          {
+            model: Ratings,
+            as: 'rating'
+          }
+        ]
       });
       return singleAccommodation;
     } catch (error) {
@@ -45,14 +168,13 @@ class accommodationService {
   }
 
   /**
-   * @param {object} room - room object.
+   * create a room for an accommodation
+   * @param {object} room - room details
    * @returns {object} - created room for accommodation
    */
   static async createRoom(room) {
     try {
-      //creates room
-      const createdRoom = await Rooms.create(room);
-
+      const createdRoom = await Rooms.bulkCreate(room);
       return createdRoom;
     } catch (error) {
       throw error;
@@ -60,9 +182,8 @@ class accommodationService {
   }
 
   /**
-  //Get all rooms for all accommodations
-   * @param {id} room - room id.
-   * @returns {object} - rooms data
+   * Get all rooms
+   * @returns {object} - all room data
    */
   static async getAllRooms() {
     try {
@@ -72,52 +193,18 @@ class accommodationService {
       throw error;
     }
   }
-  /**
 
-    //Get all rooms for an accommodation
-   * @param {id} room - room id.
-   * @returns {object} - rooms data
-   */
-  static async getRooms(id) {
-    try {
-      const data = await Rooms.findAll({
-        where: {
-          accommodationId: id
-        }
-      });
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
   /**
-   * @param {params} params - room fields.
+   * get a room by parameter
+   * @param {params} params to find by
    * @returns {object} - room object
    */
   static async getRoom(params) {
     try {
-      const room = await Room.findOne({
+      const room = await Rooms.findOne({
         where: params
       });
       return room;
-    } catch (error) {
-      throw error;
-    }
-  }
-  /**
-   * @param {id} id - room id
-   * * @param {object} data - room object
-   * @returns {object} - updated room object
-   */
-  static async updateRoom(id, data) {
-    try {
-      await Rooms.update(data, {
-        where: { id: id }
-      });
-      const updatedRoom = await Rooms.findOne({
-        where: { id: id }
-      });
-      return updatedRoom;
     } catch (error) {
       throw error;
     }
